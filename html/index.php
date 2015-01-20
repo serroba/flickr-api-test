@@ -5,21 +5,19 @@ use Config\Config;
 use Lib\Flickr;
 
 
-$params = Config::getInstance()->flickr['secret'] . 
-		'api_key' . Config::getInstance()->flickr['key'].
-		'perms' . 'read';
-$signature = md5($params);
-var_dump($params, $signature);
-$url  = "http://flickr.com/services/auth/?api_key=".Config::getInstance()->flickr['key']. "&perms=read&api_sig=$signature";
-var_dump($url);die;
 
-// determine which page to render
-$page = filter_input(INPUT_GET, 'page') ? : 'index';
-// show page
-switch ($page) {
-    case 'index':
-        \Includes\Helpers::render('templates/header', ['title' => 'Flickr API Test']);
-        
-        \Includes\Helpers::render('templates/footer');
-        break;
+if(!empty($keyword = filter_input(INPUT_GET, 'q'))){
+	$page = filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT) ? : 0;
+	$flickr = new Flickr\FlickrSearch(['page_number' => $page]);
+	\Includes\Helpers::render('templates/header', ['title' => 'Flickr API Test']);
+	\Includes\Helpers::render('templates/search-form');
+	\Includes\Helpers::render('body', ['images' => $flickr->run($keyword)]);
+	\Includes\Helpers::render('templates/pagination', ['pagination' => $flickr->getPaginationData(), 'keyword' => $keyword]);
+	\Includes\Helpers::render('templates/footer');
+
+} else {
+	\Includes\Helpers::render('templates/header', ['title' => 'Flickr API Test']);
+	\Includes\Helpers::render('templates/search-form');
+	\Includes\Helpers::render('templates/footer');
+
 }
