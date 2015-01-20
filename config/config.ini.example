@@ -2,3 +2,4 @@
 [flickr]
 flickr[key]={YOUR_KEY}
 flickr[secret]={YOUR_SECRET}
+flickr[page_size]=5
